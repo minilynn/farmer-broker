@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gul.farmerbroker.common.BaseModel;
-import com.gul.farmerbroker.goods.repository.GoodsRepository;
-import com.gul.farmerbroker.goods.resource.Goods;
+import com.gul.farmerbroker.goods.domain.Goods;
+import com.gul.farmerbroker.goods.dos.IGoodsRepository;
 import com.gul.farmerbroker.goods.resource.GoodsResource;
 
 /**
@@ -32,7 +32,7 @@ public class GoodsTrade extends GoodsBaseAction {
 	private final static Logger logger = LoggerFactory.getLogger(GoodsTrade.class);
 
 	@Autowired
-	private GoodsRepository goodsRep;
+	private IGoodsRepository goodsRep;
 
 	// 检索所有书本
 	@RequestMapping(method = RequestMethod.GET, produces = "application/hal+json")

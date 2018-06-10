@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.gul.farmerbroker.goods.resource;
+package com.gul.farmerbroker.goods.domain;
 
 import java.sql.Timestamp;
 

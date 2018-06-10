@@ -19,7 +19,7 @@ public class GoodsBaseAction {
 	EntityLinks entityLinks;
 
 	// 构建单个资源对象
-	public Resource genResultListByCode(BaseModel entity) {
+	public Resource<?> genResultListByCode(BaseModel entity) {
 		return new GoodsResourceAssembler(getClass()).toResource(entity);
 
 	}
