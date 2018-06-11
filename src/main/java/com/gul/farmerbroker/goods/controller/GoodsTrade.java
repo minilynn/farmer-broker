@@ -36,10 +36,12 @@ public class GoodsTrade extends GoodsBaseAction {
 
 	// 检索所有书本
 	@RequestMapping(method = RequestMethod.GET, produces = "application/hal+json")
-	public Resources<GoodsResource> readBooksByHal() throws Exception {
+	public Resources<GoodsResource> findAllGoods() throws Exception {
 		Iterable<Goods> result = goodsRep.findAll();
 		List<BaseModel> rsList = new ArrayList<>();
-		result.forEach(goods -> rsList.add(goods));
+		if (result != null) {
+			result.forEach(goods -> rsList.add(goods));
+		}
 		return genResultList(rsList);
 	}
 
@@ -50,8 +52,7 @@ public class GoodsTrade extends GoodsBaseAction {
 		}
 
 		goods.setNew(true);
-//		goods.setId(1L);
-		
+
 		if (StringUtils.isBlank(goods.getType())) {
 			return badRequest("商品类型不能为空！");
 		}

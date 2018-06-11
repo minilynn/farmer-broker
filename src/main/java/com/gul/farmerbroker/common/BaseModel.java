@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
-public abstract class BaseModel implements Persistable<Long> {
+public class BaseModel implements Persistable<Long> {
 	private Long id;
 	private boolean newObj;
 

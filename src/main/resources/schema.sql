@@ -4,6 +4,7 @@ create database if not exists farmerbroker default charset utf8 collate utf8_gen
 -- 农场主表
 create table if not exists farmerbroker.farmer (
     id bigint unsigned not null auto_increment, -- 农场主编号
+    primary key(id)
 );
 
 -- 区域代理商表
