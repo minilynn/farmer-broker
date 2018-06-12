@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,8 +46,8 @@ public class GoodsTrade extends GoodsBaseAction {
 		return genResultList(rsList);
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> addGoods(Goods goods) {
+	@RequestMapping(method = RequestMethod.POST, consumes = "application/json;charset=UTF-8", produces = "application/hal+json")
+	public ResponseEntity<?> addGoods(@RequestBody Goods goods) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("新增商品信息：" + goods.getName());
 		}

@@ -31,20 +31,19 @@
 		farmer_rank,
 		create_time,
 		available_till,
-		description)
+		description )
 		values (
-		#type#,
-		#status#,
-		#unitType#,
-		#price#,
-		#unitCount#,
-		#name#,
-		#area#,
-		#farmerId#,
-		#farmerRank#,
-		#createTime#,
-		#availableTill#,
-		#description#
-		)
+		#{type},
+		#{status},
+		#{unitType},
+		#{price},
+		#{unitCount},
+		#{name},
+		#{area},
+		#{farmerId},
+		#{farmerRank},
+		#{createTime},
+		#{availableTill},
+		#{description} )
 	</insert>
 </mapper>
