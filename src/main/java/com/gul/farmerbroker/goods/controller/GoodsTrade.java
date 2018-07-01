@@ -10,12 +10,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gul.farmerbroker.common.BaseModel;
@@ -24,21 +26,41 @@ import com.gul.farmerbroker.goods.dos.IGoodsRepository;
 import com.gul.farmerbroker.goods.resource.GoodsResource;
 
 /**
- *
+ * 商品服务Controller
+ * 
  * @author Lynn
- *
  */
 @RestController("goods")
 public class GoodsTrade extends GoodsBaseAction {
 	private final static Logger logger = LoggerFactory.getLogger(GoodsTrade.class);
 
+	/** 商品服务DOS对象 */
 	@Autowired
 	private IGoodsRepository goodsRep;
 
-	// 检索所有书本
+	@Autowired
+	private Environment env;
+
+	/**
+	 * 检索所有商品信息
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(method = RequestMethod.GET, produces = "application/hal+json")
-	public Resources<GoodsResource> findAllGoods() throws Exception {
-		Iterable<Goods> result = goodsRep.findAll();
+	public Resources<GoodsResource> findAllGoods(@RequestParam(name = "startId", required = false) Long id,
+			@RequestParam(name = "pageSize", required = false) Integer pageSize) throws Exception {
+		Goods reqGoods = new Goods();
+		if (id != null) {
+			reqGoods.setId(id);
+		}
+		if (pageSize != null) {
+			reqGoods.setPageSize(pageSize);
+		} else if (env.getProperty("app.pageSize") != null) {
+			reqGoods.setPageSize(Integer.parseInt(env.getProperty("app.pageSize")));
+		}
+
+		Iterable<Goods> result = goodsRep.findAll(reqGoods);
 		List<BaseModel> rsList = new ArrayList<>();
 		if (result != null) {
 			result.forEach(goods -> rsList.add(goods));

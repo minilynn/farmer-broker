@@ -11,6 +11,11 @@ import com.gul.farmerbroker.goods.domain.Goods;
  * @author Lynn
  */
 public interface GoodsMapper {
-	List<Goods> findAll();
+	/**
+	 * 根据商品ID的翻页查询
+	 * @param goods
+	 * @return
+	 */
+	List<Goods> findAll(Goods goods);
 	void insert(Goods goods);
 }

@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gul.farmerbroker.goods.mapper.GoodsMapper">
+    <!-- 查询语句中的全字段 -->
+    <sql id="full_columns_for_query">
+        id AS id,
+        type AS type,
+        status AS status,
+        unit_type AS unitType,
+        price AS price,
+        unit_count AS unitCount,
+        name AS name,
+        area AS area,
+        farmer_id AS farmerId,
+        farmer_rank AS farmerRank,
+        create_time AS createTime,
+        available_till AS availableTill,
+        description AS description
+    </sql>
+
+	<!-- 首页展示，根据商品ID进行翻页查询 -->
 	<select id="findAll" resultType="Goods">
-		SELECT id AS id,
-		type AS type,
-		status AS status,
-		unit_type AS unitType,
-		price AS price,
-		unit_count AS unitCount,
-		name AS name,
-		area AS area,
-		farmer_id AS farmerId,
-		farmer_rank AS farmerRank,
-		create_time AS createTime,
-		available_till AS availableTill,
-		description AS description
-		FROM goods
+		SELECT 
+		<include refid="full_columns_for_query"></include>
+		FROM goods 
+        <![CDATA[
+        Where id<#{id} 
+        limit #{pageSize}
+        ]]>
 	</select>
 
+	<!-- 根据农户编号进行查询，展示一个农户的所有商品 -->
+	<select id="findByFarmerId" resultType="Goods">
+		SELECT 
+        <include refid="full_columns_for_query"></include>
+		FROM goods
+		Where farmer_id = #{farmerId}
+	</select>
+
+	<!-- 新增商品信息 -->
 	<insert id="insert" parameterType="Goods">
 		insert into goods (
 		type,

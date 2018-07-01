@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 public class BaseModel implements Persistable<Long> {
 	private Long id;
 	private boolean newObj;
+	private Integer pageSize;
 
 	public void setNew(boolean newObj) {
 		this.newObj = newObj;
