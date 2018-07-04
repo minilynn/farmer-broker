@@ -10,6 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.gul.farmerbroker.common.BusinessException;
 import com.gul.farmerbroker.goods.domain.Goods;
 import com.gul.farmerbroker.goods.mapper.GoodsMapper;
 
@@ -39,6 +40,20 @@ public class GoodsRepositoryImpl implements IGoodsRepository, InitializingBean {
 			goods.setPageSize(20);
 		}
 		return gmapper.findAll(goods);
+	}
+
+	/**
+	 * 根据农场主编号查询其所有商品列表
+	 * 
+	 * @see com.gul.farmerbroker.goods.dos.IGoodsRepository#findByFarmerId(com.gul.farmerbroker.goods.domain.Goods)
+	 */
+	@Override
+	public List<Goods> findByFarmerId(Goods goods) throws BusinessException {
+		if (goods == null || goods.getFarmerId() == null) {
+			throw new BusinessException("请指定农场主ID");
+		}
+
+		return gmapper.findByFarmerId(goods);
 	}
 
 	@Override

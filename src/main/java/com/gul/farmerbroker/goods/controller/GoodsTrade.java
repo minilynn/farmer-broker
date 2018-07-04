@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +31,8 @@ import com.gul.farmerbroker.goods.resource.GoodsResource;
  * 
  * @author Lynn
  */
-@RestController("goods")
+@RestController
+@RequestMapping("/goods")
 public class GoodsTrade extends GoodsBaseAction {
 	private final static Logger logger = LoggerFactory.getLogger(GoodsTrade.class);
 
@@ -61,6 +63,30 @@ public class GoodsTrade extends GoodsBaseAction {
 		}
 
 		Iterable<Goods> result = goodsRep.findAll(reqGoods);
+		List<BaseModel> rsList = new ArrayList<>();
+		if (result != null) {
+			result.forEach(goods -> rsList.add(goods));
+		}
+
+		return genResultList(rsList);
+	}
+
+	/**
+	 * 检索农场主的所有商品列表
+	 * 
+	 * @param id
+	 *            农场主编号
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(path = "/farmer/{id}", method = RequestMethod.GET, produces = "application/hal+json")
+	public Resources<GoodsResource> findFarmerGoods(@PathVariable Integer id) throws Exception {
+		Goods reqGoods = new Goods();
+		if (id != null) {
+			reqGoods.setFarmerId(id);
+		}
+
+		Iterable<Goods> result = goodsRep.findByFarmerId(reqGoods);
 		List<BaseModel> rsList = new ArrayList<>();
 		if (result != null) {
 			result.forEach(goods -> rsList.add(goods));

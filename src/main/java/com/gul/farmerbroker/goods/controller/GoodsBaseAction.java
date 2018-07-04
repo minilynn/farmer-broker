@@ -12,6 +12,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpHeaders;
 
 import com.gul.farmerbroker.common.BaseModel;
+import com.gul.farmerbroker.goods.domain.Goods;
 import com.gul.farmerbroker.goods.resource.GoodsResource;
 
 public class GoodsBaseAction {
@@ -26,8 +27,14 @@ public class GoodsBaseAction {
 
 	// 构建多个资源对象
 	public Resources<GoodsResource> genResultList(List<BaseModel> entities) {
-		Link link = linkTo(getClass()).withSelfRel();
-		return new Resources<>(new GoodsResourceAssembler(getClass()).toResources(entities), link);
+		Link selfLink = linkTo(getClass()).withSelfRel();
+		List<GoodsResource> resList = new GoodsResourceAssembler(getClass()).toResources(entities);
+		for (GoodsResource res : resList) {
+			Goods goods = (Goods) res.getContent();
+			Link farmerLink = linkTo(getClass()).slash("farmer/" + goods.getFarmerId()).withRel("farmer_goods");
+			res.add(farmerLink);
+		}
+		return new Resources<>(resList, selfLink);
 	}
 
 	// 返回请求头的信息
