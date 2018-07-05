@@ -3,6 +3,8 @@
  */
 package com.gul.farmerbroker.goods.controller;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +25,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gul.farmerbroker.common.BaseAction;
 import com.gul.farmerbroker.common.BaseModel;
 import com.gul.farmerbroker.goods.domain.Goods;
 import com.gul.farmerbroker.goods.dos.IGoodsRepository;
-import com.gul.farmerbroker.goods.resource.GoodsResource;
 
 /**
  * 商品服务Controller
@@ -33,8 +37,8 @@ import com.gul.farmerbroker.goods.resource.GoodsResource;
  */
 @RestController
 @RequestMapping("/goods")
-public class GoodsTrade extends GoodsBaseAction {
-	private final static Logger logger = LoggerFactory.getLogger(GoodsTrade.class);
+public class GoodsController extends BaseAction {
+	private final static Logger logger = LoggerFactory.getLogger(GoodsController.class);
 
 	/** 商品服务DOS对象 */
 	@Autowired
@@ -49,8 +53,9 @@ public class GoodsTrade extends GoodsBaseAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/hal+json")
-	public Resources<GoodsResource> findAllGoods(@RequestParam(name = "startId", required = false) Long id,
+	public Resources<Resource> findAllGoods(@RequestParam(name = "startId", required = false) Long id,
 			@RequestParam(name = "pageSize", required = false) Integer pageSize) throws Exception {
 		Goods reqGoods = new Goods();
 		if (id != null) {
@@ -79,8 +84,9 @@ public class GoodsTrade extends GoodsBaseAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(path = "/farmer/{id}", method = RequestMethod.GET, produces = "application/hal+json")
-	public Resources<GoodsResource> findFarmerGoods(@PathVariable Integer id) throws Exception {
+	public Resources<Resource> findFarmerGoods(@PathVariable Integer id) throws Exception {
 		Goods reqGoods = new Goods();
 		if (id != null) {
 			reqGoods.setFarmerId(id);
@@ -120,5 +126,20 @@ public class GoodsTrade extends GoodsBaseAction {
 	private ResponseEntity<?> badRequest(String msg) {
 		ResponseEntity<?> response = new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
 		return response;
+	}
+
+	/**
+	 * 添加个性化子资源URI
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Resources<Resource> genResultList(List<BaseModel> entities) {
+		Resources<Resource> resList = super.genResultList(entities);
+		for (Resource res : resList) {
+			Goods goods = (Goods) res.getContent();
+			Link farmerLink = linkTo(getClass()).slash("farmer/" + goods.getFarmerId()).withRel("farmer_goods");
+			res.add(farmerLink);
+		}
+		return resList;
 	}
 }
