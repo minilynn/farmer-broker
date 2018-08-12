@@ -8,27 +8,34 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gul.farmerbroker.common.BaseAction;
 import com.gul.farmerbroker.common.BaseModel;
+import com.gul.farmerbroker.common.BusinessException;
+import com.gul.farmerbroker.configuration.PropertiesHolder;
 import com.gul.farmerbroker.goods.domain.Goods;
 import com.gul.farmerbroker.goods.dos.IGoodsRepository;
+import com.gul.farmerbroker.utils.ImageUtil;
 
 /**
  * 商品服务Controller
@@ -44,8 +51,11 @@ public class GoodsController extends BaseAction {
 	@Autowired
 	private IGoodsRepository goodsRep;
 
-	@Autowired
-	private Environment env;
+	@Value("${app.pageSize:null}")
+	private Integer pageSize;
+
+	@Value("${image.path:static/images}")
+	private String imgPath;
 
 	/**
 	 * 检索所有商品信息
@@ -62,10 +72,9 @@ public class GoodsController extends BaseAction {
 			reqGoods.setId(id);
 		}
 		if (pageSize != null) {
-			reqGoods.setPageSize(pageSize);
-		} else if (env.getProperty("app.pageSize") != null) {
-			reqGoods.setPageSize(Integer.parseInt(env.getProperty("app.pageSize")));
+			this.pageSize = pageSize;
 		}
+		reqGoods.setPageSize(pageSize);
 
 		Iterable<Goods> result = goodsRep.findAll(reqGoods);
 		List<BaseModel> rsList = new ArrayList<>();
@@ -112,6 +121,56 @@ public class GoodsController extends BaseAction {
 			return badRequest("商品类型不能为空！");
 		}
 		goodsRep.save(goods);
+
+		return null;
+	}
+
+	/**
+	 * 上传图片，图片文件的Key名为image-file
+	 * 
+	 * @param multipartFile
+	 * @return
+	 * @throws Exception
+	 */
+	// @RequestMapping(path = "/image", method = RequestMethod.POST, produces =
+	// "application/hal+json")
+	@PostMapping(path = "/image", produces = "application/hal+json")
+	public ResponseEntity<?> uploadImg(@RequestParam("image-file") MultipartFile multipartFile,
+			HttpServletRequest request) throws Exception {
+		if (multipartFile == null || multipartFile.isEmpty()
+				|| StringUtils.isBlank(multipartFile.getOriginalFilename())) {
+			throw new BusinessException(PropertiesHolder.getPropertyValue("err.goods.image.absent"));
+		}
+
+		String contentType = multipartFile.getContentType();
+		if (!contentType.contains("")) {
+			throw new BusinessException(PropertiesHolder.getPropertyValue("err.goods.image.format"));
+		}
+
+		String orgFileName = multipartFile.getOriginalFilename();
+		logger.info("上传图片:name={},type={}", orgFileName, contentType);
+		// 处理图片
+		// User currentUser = userService.getCurrentUser();
+		// 获取路径
+		String sufPath = ImageUtil.getFileName("", orgFileName);
+		String filePath = imgPath + sufPath;
+		logger.info("图片保存路径={}", filePath);
+		String file_name = null;
+		// try {
+		// file_name = ImageUtil.saveImg(multipartFile, filePath);
+		// MarkDVo markDVo = new MarkDVo();
+		// markDVo.setSuccess(0);
+		// if (StringUtils.isNotBlank(file_name)) {
+		// markDVo.setSuccess(1);
+		// markDVo.setMessage("上传成功");
+		// markDVo.setUrl(sufPath + File.separator + file_name);
+		// markDVo.setCallback(callback);
+		// }
+		// logger.info("返回值：{}", markDVo);
+		// return markDVo;
+		// } catch (IOException e) {
+		// throw new BusinessException(ResultEnum.SAVE_IMG_ERROE);
+		// }
 
 		return null;
 	}
